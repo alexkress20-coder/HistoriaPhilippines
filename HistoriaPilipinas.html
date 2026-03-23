@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Historia Pilipinas | Messiah P. Bermudez</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    },
+                    colors: { 
+                        ph: {
+                            blue: '#0038a8',
+                            red: '#ce1126',
+                            yellow: '#fcd116',
+                            dark: '#12100e',
+                            sepia: '#2a2420'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0c0a09;
+            color: #f8fafc;
+            overflow: hidden;
+            height: 100vh;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .app-container {
+            max-width: 480px;
+            height: 100vh;
+            margin: 0 auto;
+            position: relative;
+            background: radial-gradient(circle at top, #1c1917 0%, #0c0a09 100%);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid rgba(252, 209, 22, 0.1);
+            border-right: 1px solid rgba(252, 209, 22, 0.1);
+        }
+        .safe-area-top { height: env(safe-area-inset-top, 20px); }
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            padding-bottom: 120px;
+            scroll-behavior: smooth;
+        }
+        .glass {
+            background: rgba(42, 36, 32, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(252, 209, 22, 0.1);
+        }
+        .nav-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: env(safe-area-inset-bottom, 15px);
+            background: rgba(12, 10, 9, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(252, 209, 22, 0.2);
+            z-index: 50;
+            transition: transform 0.4s ease;
+        }
+        .nav-bar.hidden-nav { transform: translateY(100%); }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #78716c;
+            transition: all 0.3s;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .nav-item.active { color: #fcd116; }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide { animation: slideUp 0.5s ease-out forwards; }
+        
+        .img-card {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .sun-rays {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150vmax;
+            height: 150vmax;
+            margin-left: -75vmax;
+            margin-top: -75vmax;
+            background: repeating-conic-gradient(from 0deg, rgba(252, 209, 22, 0.04) 0deg 15deg, transparent 15deg 30deg);
+            animation: rotateSun 80s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes rotateSun { 100% { transform: rotate(360deg); } }
+        
+        .ph-flag-mini {
+            width: 40px;
+            height: 20px;
+            position: relative;
+            background: linear-gradient(to bottom, #0038a8 50%, #ce1126 50%);
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+        .ph-flag-mini::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 10px 0 10px 17px;
+            border-color: transparent transparent transparent #ffffff;
+            z-index: 1;
+        }
+
+        .k-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.1s;
+        }
+        .k-btn:active { background: #fcd116; color: #000; }
+
+        .modal-overlay {
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: #78716c;
+        }
+        .lang-btn.active {
+            background: #fcd116;
+            color: #000;
+            border-color: #fcd116;
+        }
+        
+        .name-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(252, 209, 22, 0.2);
+            padding: 1rem;
+            border-radius: 1rem;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .name-input:focus {
+            border-color: #fcd116;
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- INTRO WELCOME SCREEN -->
+        <div id="screen-welcome" class="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-ph-dark transition-opacity duration-1000">
+            <div class="sun-rays"></div>
+            <div class="z-10 text-center px-8 animate-slide w-full">
+                <div class="mb-6 relative inline-block">
+                    <div class="w-20 h-20 bg-ph-yellow rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(252,209,22,0.3)] mx-auto">
+                        <span class="text-4xl">☀️</span>
+                    </div>
+                </div>
+                <h1 class="font-serif text-5xl font-bold text-white mb-1 italic">Historia</h1>
+                <h2 class="font-serif text-3xl font-medium text-ph-yellow mb-6 tracking-widest uppercase">Pilipinas</h2>
+                
+                <div class="flex justify-center gap-2 mb-6">
+                    <button id="lang-tl" onclick="setLanguage('tl')" class="lang-btn active">TAGALOG</button>
+                    <button id="lang-en" onclick="setLanguage('en')" class="lang-btn">ENGLISH</button>
+                </div>
+
+                <div class="mb-8 max-w-xs mx-auto text-center">
+                    <p id="lbl-enter-name" class="text-[9px] font-black text-stone-500 uppercase tracking-widest mb-2">Ipasok ang iyong pangalan</p>
+                    <input type="text" id="userInputName" maxlength="20" placeholder="..." class="name-input">
+                </div>
+
+                <p id="welcome-quote" class="text-stone-400 text-xs mb-10 leading-relaxed italic max-w-xs mx-auto font-medium">
+                    "Ang hindi marunong lumingon sa pinanggalingan ay hindi makakarating sa paroroonan."
+                </p>
+                <button id="btn-start" onclick="enterApp()" class="bg-gradient-to-r from-ph-red to-red-800 text-white px-12 py-4 rounded-full font-bold shadow-2xl tracking-[0.2em] text-xs uppercase hover:scale-105 active:scale-95 transition-transform">
+                    Simulan ang Paglalakbay
+                </button>
+            </div>
+            <div class="absolute bottom-10 text-[10px] text-stone-600 font-bold tracking-widest uppercase">
+                Created by Messiah P. Bermudez
+            </div>
+        </div>
+
+        <div class="safe-area-top"></div>
+
+        <!-- APP HEADER -->
+        <header id="main-header" class="px-6 py-5 flex justify-between items-center border-b border-ph-yellow/10 opacity-0 transition-opacity">
+            <div>
+                <h1 class="text-xl font-serif font-bold text-white tracking-tight">Historia<span class="text-ph-yellow italic">PH</span></h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <div class="w-20 h-1 bg-stone-800 rounded-full overflow-hidden">
+                        <div id="xpBar" class="h-full bg-ph-yellow transition-all duration-700" style="width: 15%"></div>
+                    </div>
+                    <span class="text-[9px] font-black text-stone-500 uppercase"><span id="lbl-rank">TIER</span>: <span id="difficultyLabel" class="text-ph-yellow">EASY</span></span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <div id="lbl-name" class="text-[10px] font-black text-stone-500 uppercase tracking-tighter">Name</div>
+                    <div id="display-name" class="text-[10px] font-bold text-ph-yellow uppercase">MESSIAH P. BERMUDEZ</div>
+                </div>
+                <div class="rounded-sm glass border border-ph-yellow/20 p-1 flex items-center justify-center">
+                    <div class="ph-flag-mini"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN SCREENS -->
+        <main id="appContent" class="content-scroll opacity-0 transition-opacity">
+            
+            <!-- PLAZA (HOME) -->
+            <section id="screen-home" class="space-y-6 hidden">
+                <div class="relative overflow-hidden rounded-[2rem] p-8 bg-gradient-to-br from-ph-blue via-blue-900 to-black border border-blue-400/20 shadow-2xl">
+                    <div class="relative z-10">
+                        <h2 id="home-greeting" class="font-serif text-3xl font-bold mb-2 text-white italic">Mabuhay!</h2>
+                        <p id="home-sub" class="text-blue-100/70 text-sm mb-8 leading-relaxed">Piliin ang antas ng iyong kaalaman sa kasaysayan.</p>
+                        <div class="flex flex-col gap-2">
+                            <button id="btn-easy" onclick="initGame('visual', 'Easy')" class="bg-emerald-500 text-white px-8 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg">Easy (Image + Choices)</button>
+                            <button id="btn-average" onclick="initGame('visual', 'Average')" class="bg-ph-yellow text-ph-dark px-8 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg">Average (Questions Only)</button>
+                            <button id="btn-advanced" onclick="initGame('visual', 'Advanced')" class="bg-ph-red text-white px-8 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg">Advanced (Enumeration)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 id="lbl-trials" class="font-serif font-bold text-ph-yellow mb-4 px-1 text-lg">Timeline Trials</h3>
+                <div class="grid grid-cols-1 gap-4">
+                    <div onclick="initGame('chronology', 'Average')" class="glass p-6 rounded-3xl cursor-pointer flex items-center gap-6 hover:border-ph-yellow/40 transition-colors">
+                        <div class="w-14 h-14 bg-ph-blue/20 text-ph-blue rounded-2xl flex items-center justify-center text-2xl border border-ph-blue/20">⏳</div>
+                        <div>
+                            <div id="lbl-chronology-title" class="font-bold text-sm text-white">Chronology Master</div>
+                            <div id="lbl-chronology-sub" class="text-[10px] text-stone-500 mt-1 uppercase tracking-widest">Pinpoint the Year</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-[2rem] border-l-4 border-ph-yellow">
+                    <p id="randomTrivia" class="text-sm text-stone-300 italic leading-relaxed font-serif">"The Philippine flag was first unfurled in Kawit, Cavite in 1898."</p>
+                </div>
+            </section>
+
+            <!-- TRIALS (PLAY) -->
+            <section id="screen-play" class="hidden">
+                <div id="gameplay-area">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="text-[10px] font-black text-ph-yellow uppercase tracking-[0.2em]" id="gameModeTitle">MODE</div>
+                        <div class="flex gap-2">
+                            <span class="bg-ph-red/20 border border-ph-red/30 text-ph-red px-3 py-1.5 rounded-full text-[10px] font-black"><span id="lbl-lives">LIVES</span>: <span id="lives" class="text-white">3</span></span>
+                            <span class="bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-full text-[10px] font-black"><span id="lbl-score">SCORE</span>: <span id="score" class="text-white">0</span></span>
+                        </div>
+                    </div>
+
+                    <div id="imageContainer" class="relative mb-6">
+                        <img id="qImage" src="" class="img-card border border-stone-800" alt="History Image">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent rounded-[1.5rem]"></div>
+                        <div id="questionDisplay" class="absolute bottom-0 left-0 right-0 p-6 text-center font-serif font-bold text-xl leading-snug text-white">
+                            Loading...
+                        </div>
+                    </div>
+                    
+                    <div id="textQuestionDisplay" class="hidden glass p-8 rounded-[2rem] border-ph-yellow/20 mb-6 text-center">
+                        <div id="lbl-id-mode" class="text-[10px] text-ph-yellow font-black uppercase tracking-widest mb-4">Identification</div>
+                        <h2 id="qTextOnly" class="font-serif text-2xl font-bold text-white italic leading-tight"></h2>
+                    </div>
+
+                    <div id="feedback" class="min-h-[2.5rem] flex flex-col items-center justify-center mb-4 transition-all duration-300">
+                        <div id="feedbackMain" class="text-[10px] font-black tracking-widest uppercase"></div>
+                        <div id="feedbackCorrect" class="text-[12px] font-bold text-white mt-1 opacity-0 transition-opacity"></div>
+                    </div>
+
+                    <div id="enumerationUI" class="hidden space-y-4">
+                        <div class="bg-stone-900 border border-ph-yellow/30 p-4 rounded-xl text-center">
+                            <div id="enumInput" class="text-xl font-bold text-ph-yellow tracking-widest min-h-[30px]"></div>
+                        </div>
+                        <div id="keyboard" class="grid grid-cols-10 gap-1"></div>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                             <button id="btn-delete" onclick="pressKey('DELETE')" class="k-btn text-ph-red col-span-1">DELETE</button>
+                             <button id="btn-submit-enum" onclick="submitEnum()" class="k-btn bg-ph-blue text-white col-span-1">SUBMIT</button>
+                        </div>
+                    </div>
+
+                    <div id="multipleUI" class="hidden space-y-3">
+                        <button onclick="submitChoice(0)" id="choice0" class="glass w-full p-5 rounded-2xl text-left text-sm font-semibold hover:border-ph-yellow transition-all text-white"></button>
+                        <button onclick="submitChoice(1)" id="choice1" class="glass w-full p-5 rounded-2xl text-left text-sm font-semibold hover:border-ph-yellow transition-all text-white"></button>
+                        <button onclick="submitChoice(2)" id="choice2" class="glass w-full p-5 rounded-2xl text-left text-sm font-semibold hover:border-ph-yellow transition-all text-white"></button>
+                        <button onclick="submitChoice(3)" id="choice3" class="glass w-full p-5 rounded-2xl text-left text-sm font-semibold hover:border-ph-yellow transition-all text-white"></button>
+                    </div>
+
+                    <div id="chronologyUI" class="hidden">
+                        <div id="guessInputDisplay" class="w-full bg-stone-900/50 border border-ph-yellow/20 rounded-2xl py-6 mb-6 text-4xl text-center font-mono font-bold text-ph-yellow tracking-widest">----</div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="pressNum(1)" class="glass py-5 rounded-2xl font-bold text-xl active:bg-ph-yellow active:text-black">1</button>
+                            <button onclick="pressNum(2)" class="glass py-5 rounded-2xl font-bold text-xl active:bg-ph-yellow active:text-black">2</button>
+                            <button onclick="pressNum(3)" class="glass py-5 rounded-2xl font-bold text-xl active:bg-ph-yellow active:text-black">3</button>
+                            <button onclick="pressNum(4)" class="glass py-5 rounded-2xl font-bold text-xl active:bg-ph-yellow active:text-black">4</button>
+                            <button onclick="pressNum(5)" class="glass py-5 rounded-2xl font-bold text-xl active:bg-ph-yellow active:text-black">5</button>
+                            <button onclick="pressNum(6)" class="glass py-5 rounded-2xl font-bold text-xl active:bg-ph-yellow active:text-black">6</button>
+                            <button onclick="pressNum(7)" class="glass py-5 rounded-2xl font-bold text-xl active:bg-ph-yellow active:text-black">7</button>
+                            <button onclick="pressNum(8)" class="glass py-5 rounded-2xl font-bold text-xl active:bg-ph-yellow active:text-black">8</button>
+                            <button onclick="pressNum(9)" class="glass py-5 rounded-2xl font-bold text-xl active:bg-ph-yellow active:text-black">9</button>
+                            <button onclick="pressClear()" class="glass py-5 rounded-2xl font-bold text-xs text-red-500">DEL</button>
+                            <button onclick="pressNum(0)" class="glass py-5 rounded-2xl font-bold text-xl active:bg-ph-yellow active:text-black">0</button>
+                            <button id="btn-submit-year" onclick="submitAnswer()" class="bg-ph-blue py-5 rounded-2xl font-bold text-[10px] tracking-widest text-white uppercase border border-blue-400/30">Submit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="gameOver" class="hidden text-center py-12 space-y-8 animate-slide">
+                    <div class="text-7xl">🕯️</div>
+                    <h2 id="lbl-end-title" class="font-serif text-5xl font-bold text-ph-red italic">Wakas</h2>
+                    <p id="lbl-end-msg" class="text-stone-400 px-10 text-sm">Every defeat is a seed for future triumph.</p>
+                    <div class="glass p-8 rounded-[2rem] mx-6 border-ph-yellow/20">
+                        <div id="lbl-final-score" class="text-[10px] text-ph-yellow font-black uppercase tracking-widest mb-2">Final Score</div>
+                        <div id="finalScore" class="text-6xl font-black text-white">0</div>
+                    </div>
+                    <button id="btn-back-main" onclick="requestNavigation('home')" class="bg-white text-black font-bold px-12 py-4 rounded-2xl mx-6 shadow-lg uppercase text-xs tracking-widest active:scale-95 transition-transform">Bumalik sa Plaza</button>
+                </div>
+
+                <div id="gameVictory" class="hidden text-center py-12 space-y-8 animate-slide">
+                    <div class="text-7xl">🏆</div>
+                    <h2 id="lbl-victory-title" class="font-serif text-5xl font-bold text-ph-yellow italic">Tagumpay</h2>
+                    <p id="lbl-victory-msg" class="text-stone-300 px-10 text-sm">You have mastered this historical tier.</p>
+                    <button id="btn-vic-plaza" onclick="requestNavigation('home')" class="bg-ph-yellow text-ph-dark font-bold px-12 py-4 rounded-2xl mx-6 shadow-lg uppercase text-xs tracking-widest">Proceed to Plaza</button>
+                </div>
+            </section>
+
+            <!-- ARCHIVE -->
+            <section id="screen-study" class="hidden space-y-6">
+                <div class="px-2">
+                    <h2 id="lbl-archive-title" class="font-serif text-3xl font-bold text-white italic">Historical Archives</h2>
+                    <p id="lbl-archive-sub" class="text-stone-500 text-xs mt-1 font-bold uppercase tracking-wider">Tap a record to view dossier</p>
+                </div>
+                <div id="archiveList" class="grid grid-cols-2 gap-4 pb-20"></div>
+            </section>
+        </main>
+
+        <!-- NAVIGATION -->
+        <nav id="main-nav" class="nav-bar hidden-nav">
+            <button onclick="requestNavigation('home')" id="tab-home" class="nav-item active">
+                <span class="text-2xl mb-1">🏛️</span>
+                <span id="nav-plaza">PLAZA</span>
+            </button>
+            <button onclick="requestNavigation('play')" id="tab-play" class="nav-item">
+                <span class="text-2xl mb-1">⚔️</span>
+                <span id="nav-trials">TRIALS</span>
+            </button>
+            <button onclick="requestNavigation('study')" id="tab-study" class="nav-item">
+                <span class="text-2xl mb-1">📚</span>
+                <span id="nav-archive">ARCHIVE</span>
+            </button>
+        </nav>
+        
+        <!-- NAV CONFIRMATION MODAL -->
+        <div id="navConfirmModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-6 modal-overlay">
+            <div class="bg-stone-900 w-full max-w-xs rounded-[2rem] p-8 border border-ph-yellow/30 shadow-2xl text-center space-y-6">
+                <div class="w-16 h-16 bg-ph-yellow/10 rounded-full flex items-center justify-center mx-auto border border-ph-yellow/20">
+                    <span class="text-2xl">🏛️</span>
+                </div>
+                <div>
+                    <h3 id="lbl-nav-confirm-title" class="font-serif text-xl font-bold text-white italic mb-2">Lipat ng Lokasyon?</h3>
+                    <p id="navConfirmText" class="text-stone-400 text-xs leading-relaxed">Sigurado ka bang nais mong lumabas sa kasalukuyang trial? Mawawala ang iyong progress.</p>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button id="btn-continue-playing" onclick="cancelNavigation()" class="w-full bg-ph-yellow text-ph-dark py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg">Continue Playing</button>
+                    <button id="confirmExitBtn" class="w-full bg-white/5 border border-white/10 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest">Exit to Main</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ARCHIVE MODAL -->
+        <div id="archiveModal" class="fixed inset-0 z-[60] hidden bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 transition-all duration-300">
+           <div class="bg-ph-sepia w-full max-w-sm rounded-[2.5rem] overflow-hidden border border-ph-yellow/20 shadow-2xl scale-90 transition-transform" id="archiveModalContent">
+               <div class="relative h-60">
+                   <img id="modalImg" class="w-full h-full object-cover" src="">
+                   <div class="absolute inset-0 bg-gradient-to-t from-ph-sepia via-transparent to-transparent"></div>
+               </div>
+               <div class="p-8 -mt-10 relative z-10">
+                   <div id="modalSubtitle" class="text-[9px] font-black text-ph-yellow mb-2 uppercase tracking-widest"></div>
+                   <h3 id="modalTitle" class="font-serif text-2xl font-bold text-white mb-4 italic leading-tight"></h3>
+                   <p id="modalDesc" class="text-sm text-stone-300 leading-relaxed mb-8 max-h-48 overflow-y-auto pr-2 scrollbar-hide"></p>
+                   <button id="btn-close-record" onclick="closeModal()" class="w-full bg-white/5 border border-white/10 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest text-white">Close Record</button>
+               </div>
+           </div>
+        </div>
+    </div>
+
+    <script>
+        const i18n = {
+            tl: {
+                welcomeQuote: '"Ang hindi marunong lumingon sa pinanggalingan ay hindi makakarating sa paroroonan."',
+                btnStart: 'Simulan ang Paglalakbay',
+                lblRank: 'ANTAS',
+                lblName: 'Pangalan',
+                lblEnterName: 'Ipasok ang iyong pangalan',
+                homeGreeting: 'Mabuhay!',
+                homeSub: 'Piliin ang antas ng iyong kaalaman sa kasaysayan.',
+                btnEasy: 'Madali (Larawan + Pagpipilian)',
+                btnAverage: 'Katamtaman (Tanong Lamang)',
+                btnAdvanced: 'Mahirap (Enumerasyon)',
+                lblTrials: 'Mga Pagsubok sa Timeline',
+                lblChronologyTitle: 'Pantas ng Panahon',
+                lblChronologySub: 'Tukuyin ang Taon',
+                lblLives: 'BUHAY',
+                lblScore: 'PUNTOS',
+                lblIdMode: 'Identipikasyon',
+                btnDelete: 'BURAHIN',
+                btnSubmit: 'IPASA',
+                lblEndTitle: 'Wakas',
+                lblEndMsg: 'Ang bawat pagkatalo ay binhi ng tagumpay.',
+                lblFinalScore: 'Huling Puntos',
+                btnBackMain: 'Bumalik sa Plaza',
+                lblVictoryTitle: 'Tagumpay',
+                lblVictoryMsg: 'Ikaw ay bihasa na sa antas na ito.',
+                btnVicPlaza: 'Bumalik sa Plaza',
+                lblArchiveTitle: 'Makasaysayang Arkibo',
+                lblArchiveSub: 'I-tap ang record para sa detalye',
+                navPlaza: 'PLAZA',
+                navTrials: 'PAGSUBOK',
+                navArchive: 'ARKIBO',
+                lblNavTitle: 'Lipat ng Lokasyon?',
+                navConfirmText: 'Sigurado ka bang nais mong lumabas? Mawawala ang iyong naipong score.',
+                btnContinue: 'Ipagpatuloy ang Laro',
+                btnExit: 'Lumabas',
+                btnCloseRecord: 'Isara ang Record',
+                feedbackCorrect: 'TUMPAK!',
+                feedbackWrong: 'MALI!',
+                answer: 'Sagot'
+            },
+            en: {
+                welcomeQuote: '"He who does not look back at where he came from will never reach his destination."',
+                btnStart: 'Begin the Journey',
+                lblRank: 'TIER',
+                lblName: 'Name',
+                lblEnterName: 'Enter your name',
+                homeGreeting: 'Welcome!',
+                homeSub: 'Select the level of your historical knowledge.',
+                btnEasy: 'Easy (Image + Choices)',
+                btnAverage: 'Average (Questions Only)',
+                btnAdvanced: 'Advanced (Enumeration)',
+                lblTrials: 'Timeline Trials',
+                lblChronologyTitle: 'Chronology Master',
+                lblChronologySub: 'Pinpoint the Year',
+                lblLives: 'LIVES',
+                lblScore: 'SCORE',
+                lblIdMode: 'Identification',
+                btnDelete: 'DELETE',
+                btnSubmit: 'SUBMIT',
+                lblEndTitle: 'The End',
+                lblEndMsg: 'Every defeat is a seed for future triumph.',
+                lblFinalScore: 'Final Score',
+                btnBackMain: 'Back to Plaza',
+                lblVictoryTitle: 'Victory',
+                lblVictoryMsg: 'You have mastered this historical tier.',
+                btnVicPlaza: 'Proceed to Plaza',
+                lblArchiveTitle: 'Historical Archives',
+                lblArchiveSub: 'Tap a record to view dossier',
+                navPlaza: 'PLAZA',
+                navTrials: 'TRIALS',
+                navArchive: 'ARCHIVE',
+                lblNavTitle: 'Change Location?',
+                navConfirmText: 'Are you sure you want to exit? Your current score will be lost.',
+                btnContinue: 'Continue Playing',
+                btnExit: 'Exit to Main',
+                btnCloseRecord: 'Close Record',
+                feedbackCorrect: 'CORRECT!',
+                feedbackWrong: 'WRONG!',
+                answer: 'Answer'
+            }
+        };
+
+        const database = {
+            chronology: [
+                { id: "c1", q: "Arrival of Magellan in Homonhon", a: 1521, img: "Chronology/Arrival of Magellan in Homonhon.jpg", desc: "The arrival of the Spanish expedition in the Philippines marked the start of the colonial era." },
+                { id: "c2", q: "Execution of GOMBURZA", a: 1872, img: "Chronology/Execution of GOMBURZA.jpg", desc: "The martyrdom of Mariano Gomez, Jose Burgos, and Jacinto Zamora ignited Filipino nationalism." },
+                { id: "c3", q: "Founding of the Katipunan (KKK)", a: 1892, img: "Chronology/Founding of the Katipunan (KKK).jpg", desc: "Andres Bonifacio founded the secret society to gain independence from Spain." },
+                { id: "c4", q: "Declaration of Independence in Kawit", a: 1898, img: "Chronology/Declaration of Independence in Kawit.jpg", desc: "Emilio Aguinaldo proclaimed Philippine independence from the window of his home." },
+                { id: "c5", q: "Battle of Mactan", a: 1521, img: "Chronology/Battle of Mactan.jpg", desc: "Lapu-Lapu defeated Ferdinand Magellan, delaying Spanish colonization for decades." },
+                { id: "c6", q: "Outbreak of the Phil-Am War", a: 1899, img: "Chronology/Outbreak of the Phil-Am War.jpg", desc: "Tensions between Filipino revolutionaries and American forces turned into a full-scale war." },
+                { id: "c7", q: "Martial Law Proclamation", a: 1972, img: "Chronology/Martial Law Proclamation.jpg", desc: "President Ferdinand Marcos placed the entire country under Martial Law." },
+                { id: "c8", q: "EDSA People Power Revolution", a: 1986, img: "Chronology/EDSA People Power Revolution.jpg", desc: "A bloodless revolution that ousted Marcos and restored democracy." },
+                { id: "c9", q: "Death of Dr. Jose Rizal", a: 1896, img: "Chronology/Death of Dr. Jose Rizal.jpg", desc: "The execution of Rizal in Bagumbayan served as the final spark for the revolution." },
+                { id: "c10", q: "Treaty of Paris (Spain cedes PH)", a: 1898, img: "Chronology/Treaty of Paris (Spain cedes PH).jpg", desc: "Spain sold the Philippines to the United States for 20 million dollars." }
+            ],
+            visual: [
+                // EASY: 10 Questions (Visual Choice)
+                { id: "v1", q: "Who is the National Hero in this portrait?", ans: "JOSE RIZAL", options: ["Jose Rizal", "Marcelo Del Pilar", "Juan Luna", "Graciano Lopez Jaena"], a: 0, img: "EASY/NOLI ME TANGERE.jpg", desc: "Dr. Jose Rizal, the national hero of the Philippines.", level: "Easy" },
+                { id: "v2", q: "The 'Supremo' of the Katipunan.", ans: "ANDRES BONIFACIO", options: ["Emilio Jacinto", "Andres Bonifacio", "Ladislaw Diwa", "Teodoro Plata"], a: 1, img: "EASY/ANDRES BONIFACIO.jpg", desc: "Andres Bonifacio, the Great Plebeian.", level: "Easy" },
+                { id: "v3", q: "The first President of the Republic.", ans: "EMILIO AGUINALDO", options: ["Manuel Quezon", "Emilio Aguinaldo", "Jose P. Laurel", "Sergio Osmeña"], a: 1, img: "EASY/EMILIO AGUINALDO.jpg", desc: "Emilio Aguinaldo, leader of the revolution.", level: "Easy" },
+                { id: "v4", q: "The 'Fiery General' of the North.", ans: "ANTONIO LUNA", options: ["Antonio Luna", "Gregorio del Pilar", "Miguel Malvar", "Artemio Ricarte"], a: 0, img: "EASY/ANTONIO LUNA.jpg", desc: "General Antonio Luna, known for his temper and brilliance.", level: "Easy" },
+                { id: "v5", q: "The 'Brains of the Katipunan'.", ans: "EMILIO JACINTO", options: ["Apolinario Mabini", "Emilio Jacinto", "Macario Sakay", "Galicano Apacible"], a: 1, img: "EASY/EMILIO JACINTO.jpg", desc: "Emilio Jacinto, the young advisor to Bonifacio.", level: "Easy" },
+                { id: "v6", q: "The 'Sublime Paralytic'.", ans: "APOLINARIO MABINI", options: ["Apolinario Mabini", "Isabelo de los Reyes", "Felipe Agoncillo", "Ambrosio Rianzares"], a: 0, img: "EASY/APOLINARIO MABINI.jpg", desc: "Apolinario Mabini, the Brains of the Revolution.", level: "Easy" },
+                { id: "v7", q: "General who led the Iloilo revolt.", ans: "MARTIN DELGADO", options: ["Aniceto Lacson", "Juan Araneta", "Martin Delgado", "Leandro Locsin"], a: 2, img: "EASY/Gen._Martín_Teófilo_Delgado_y_Bermejo.jpg", desc: "General Martin Delgado, Visayan hero.", level: "Easy" },
+                { id: "v8", q: "The 'Joan of Arc of the Visayas'.", ans: "TERESA MAGBANUA", options: ["Teresa Magbanua", "Gabriela Silang", "Agueda Kahabagan", "Marina Dizon"], a: 0, img: "EASY/TERESA MAGBANUA.jpg", desc: "Teresa Magbanua, fierce woman fighter.", level: "Easy" },
+                { id: "v9", q: "Hero of the Tirad Pass.", ans: "GREGORIO DEL PILAR", options: ["Vicente Enriquez", "Gregorio del Pilar", "Julian del Pilar", "Jose Leyba"], a: 1, img: "EASY/GREGORIO DEL PILAR.jpg", desc: "Gregorio del Pilar, the Boy General.", level: "Easy" },
+                { id: "v10", q: "Last general to surrender to Americans.", ans: "MIGUEL MALVAR", options: ["Miguel Malvar", "Gliceria Marella", "Felipe Agoncillo", "Ananias Diokno"], a: 0, img: "EASY/MIGUEL MALVAR.jpg", desc: "Miguel Malvar took command after Aguinaldo's capture.", level: "Easy" },
+                
+                // AVERAGE: 10 Questions (Text Choice)
+                { id: "va11", q: "What was the name of Rizal's first novel?", ans: "NOLI ME TANGERE", options: ["El Filibusterismo", "Noli Me Tangere", "Mi Ultimo Adios", "A La Juventud Filipina"], a: 1, img: "AVERAGE/NOLI ME TANGERE.jpg", desc: "Noli Me Tangere was published in Berlin in 1887.", level: "Average" },
+                { id: "va12", q: "Who was the 'Hero of Tirad Pass'?", ans: "GREGORIO DEL PILAR", options: ["Antonio Luna", "Emilio Aguinaldo", "Gregorio del Pilar", "Miguel Malvar"], a: 2, img: "AVERAGE/GREGORIO DEL PILAR.jpg", desc: "He died protecting the retreat of Aguinaldo.", level: "Average" },
+                { id: "va13", q: "The date of Philippine Independence from Spain.", ans: "JUNE 12 1898", options: ["July 4 1946", "June 12 1898", "August 21 1983", "December 30 1896"], a: 1, img: "AVERAGE/The date of Philippine Independence from Spain..jpg", desc: "Celebrated annually as Independence Day.", level: "Average" },
+                { id: "va14", q: "The ship that Magellan used to reach PH.", ans: "VICTORIA", options: ["Santiago", "Concepcion", "Victoria", "Trinidad"], a: 2, img: "AVERAGE/The ship that Magellan used to reach PH.jpg", desc: "The Victoria was the only ship to complete the circumnavigation.", level: "Average" },
+                { id: "va15", q: "Who composed the Philippine National Anthem?", ans: "JULIAN FELIPE", options: ["Jose Palma", "Julian Felipe", "Nicanor Abelardo", "Dolores Paterno"], a: 1, img: "AVERAGE/Who composed the Philippine National Anthem.jpg", desc: "The anthem was originally titled 'Marcha Nacional Filipina'.", level: "Average" },
+                { id: "va16", q: "The first capital of the Philippines under Spain.", ans: "CEBU", options: ["Manila", "Vigan", "Cebu", "Iloilo"], a: 2, img: "AVERAGE/The first capital of the Philippines under Spain.jpg", desc: "Legazpi established the first settlement in Cebu.", level: "Average" },
+                { id: "va17", q: "Who is the 'Great Plebeian'?", ans: "ANDRES BONIFACIO", options: ["Emilio Jacinto", "Juan Luna", "Andres Bonifacio", "Marcelo del Pilar"], a: 2, img: "AVERAGE/Who is the 'Great Plebeian.jpg", desc: "Bonifacio was a man of the masses.", level: "Average" },
+                { id: "va18", q: "Name of the first Filipino newspaper.", ans: "DEL SUPERIOR GOVIERNO", options: ["La Solidaridad", "Diario de Manila", "Del Superior Govierno", "El Renacimiento"], a: 2, img: "AVERAGE/Name of the first Filipino newspaper..jpg", desc: "Established in 1811 during the Spanish era.", level: "Average" },
+                { id: "va19", q: "Who led the Longest Revolt in PH History?", ans: "FRANCISCO DAGOHOY", options: ["Diego Silang", "Francisco Dagohoy", "Hermano Pule", "Tamblot"], a: 1, img: "AVERAGE/FRANCISCO DAGOHOY.jpg", desc: "The Dagohoy Rebellion lasted for 85 years.", level: "Average" },
+                { id: "va20", q: "What is the oldest city in the Philippines?", ans: "CEBU CITY", options: ["Manila", "Cebu City", "Davao", "Vigan"], a: 1, img: "AVERAGE/CebuCity.jpg", desc: "Founded by Miguel Lopez de Legazpi in 1565.", level: "Average" },
+
+                // ADVANCED: 10 Questions (Identification)
+                { id: "vad21", q: "Name of the secret society founded by Bonifacio.", ans: "KATIPUNAN", img: "HARD/Name of the secret society founded by andres Bonifacio.jpg", desc: "Kataastaasan, Kagalanggalangang Katipunan ng mga Anak ng Bayan.", level: "Advanced" },
+                { id: "vad22", q: "The pen name of Marcelo H. Del Pilar.", ans: "PLARIDEL", img: "HARD/PLARIDEL.jpg", desc: "Plaridel was the editor of La Solidaridad.", level: "Advanced" },
+                { id: "vad23", q: "The first Filipino to lead a revolt against Spain.", ans: "LAPU LAPU", img: "HARD/lapu lapu.jpg", desc: "The chief of Mactan who killed Magellan.", level: "Advanced" },
+                { id: "vad24", q: "Rizal's second novel, dedicated to Gomburza.", ans: "EL FILIBUSTERISMO", img: "HARD/el.jpg", desc: "The more political and darker sequel to Noli.", level: "Advanced" },
+                { id: "vad25", q: "The place where the first mass was held.", ans: "LIMASAWA", img: "HARD/limasa.jpg", desc: "A controversial historical topic between Limasawa and Butuan.", level: "Advanced" },
+                { id: "vad26", q: "Wife of Diego Silang who led the Ilocano revolt.", ans: "GABRIELA SILANG", img: "HARD/gabriela_silang-1.jpg", desc: "Known as the 'Generala'.", level: "Advanced" },
+                { id: "vad27", q: "The 'Brains of the Revolution'.", ans: "APOLINARIO MABINI", img: "HARD/apolinario-mabini.jpg", desc: "He was the chief advisor to Aguinaldo.", level: "Advanced" },
+                { id: "vad28", q: "Last name of the painter of 'Spoliarium'.", ans: "LUNA", img: "HARD/Spoliarium.jpg", desc: "Juan Luna's masterpiece won gold in Madrid.", level: "Advanced" },
+                { id: "vad29", q: "The first woman member of the Katipunan.", ans: "GREGORIA DE JESUS", img: "HARD/GREGORIA DE JESUS.jpg", desc: "The 'Lakambini' of the Katipunan.", level: "Advanced" },
+                { id: "vad30", q: "Filipino priest who led the first native revolt.", ans: "HERMANO PULE", img: "HARD/HERMANO PULE.jpg", desc: "Apolinario de la Cruz founded the Cofradia de San Jose.", level: "Advanced" }
+            ]
+        };
+
+        const allArchiveData = [...database.chronology, ...database.visual];
+        let currentTab = 'home', currentMode = 'visual', currentDifficulty = 'Easy', score = 0, lives = 3, xp = 0, currentInput = "", currentQuestion, isProcessing = false, gameInProgress = false;
+        let sessionPool = [];
+        let currentLang = 'tl';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`lang-${lang}`).classList.add('active');
+            
+            const t = i18n[lang];
+            document.getElementById('welcome-quote').innerText = t.welcomeQuote;
+            document.getElementById('btn-start').innerText = t.btnStart;
+            document.getElementById('lbl-enter-name').innerText = t.lblEnterName;
+            document.getElementById('lbl-rank').innerText = t.lblRank;
+            document.getElementById('lbl-name').innerText = t.lblName;
+            document.getElementById('home-greeting').innerText = t.homeGreeting;
+            document.getElementById('home-sub').innerText = t.homeSub;
+            document.getElementById('btn-easy').innerText = t.btnEasy;
+            document.getElementById('btn-average').innerText = t.btnAverage;
+            document.getElementById('btn-advanced').innerText = t.btnAdvanced;
+            document.getElementById('lbl-trials').innerText = t.lblTrials;
+            document.getElementById('lbl-chronology-title').innerText = t.lblChronologyTitle;
+            document.getElementById('lbl-chronology-sub').innerText = t.lblChronologySub;
+            document.getElementById('nav-plaza').innerText = t.navPlaza;
+            document.getElementById('nav-trials').innerText = t.navTrials;
+            document.getElementById('nav-archive').innerText = t.navArchive;
+            document.getElementById('lbl-lives').innerText = t.lblLives;
+            document.getElementById('lbl-score').innerText = t.lblScore;
+            document.getElementById('lbl-id-mode').innerText = t.lblIdMode;
+            document.getElementById('btn-delete').innerText = t.btnDelete;
+            document.getElementById('btn-submit-enum').innerText = t.btnSubmit;
+            document.getElementById('btn-submit-year').innerText = t.btnSubmit;
+            document.getElementById('lbl-end-title').innerText = t.lblEndTitle;
+            document.getElementById('lbl-end-msg').innerText = t.lblEndMsg;
+            document.getElementById('lbl-final-score').innerText = t.lblFinalScore;
+            document.getElementById('btn-back-main').innerText = t.btnBackMain;
+            document.getElementById('lbl-victory-title').innerText = t.lblVictoryTitle;
+            document.getElementById('lbl-victory-msg').innerText = t.lblVictoryMsg;
+            document.getElementById('btn-vic-plaza').innerText = t.btnVicPlaza;
+            document.getElementById('lbl-archive-title').innerText = t.lblArchiveTitle;
+            document.getElementById('lbl-archive-sub').innerText = t.lblArchiveSub;
+            document.getElementById('lbl-nav-confirm-title').innerText = t.lblNavTitle;
+            document.getElementById('navConfirmText').innerText = t.navConfirmText;
+            document.getElementById('btn-continue-playing').innerText = t.btnContinue;
+            document.getElementById('confirmExitBtn').innerText = t.btnExit;
+            document.getElementById('btn-close-record').innerText = t.btnCloseRecord;
+        }
+
+        function enterApp() {
+            const nameInput = document.getElementById('userInputName').value.trim();
+            document.getElementById('display-name').innerText = nameInput || "KABABAYAN";
+            document.getElementById('screen-welcome').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('screen-welcome').style.display = 'none';
+                document.getElementById('main-header').classList.replace('opacity-0', 'opacity-100');
+                document.getElementById('appContent').classList.replace('opacity-0', 'opacity-100');
+                document.getElementById('main-nav').classList.remove('hidden-nav');
+                switchTab('home', true);
+            }, 1000);
+            renderKeyboard();
+        }
+
+        function requestNavigation(targetTab) {
+            if (currentTab === targetTab) return;
+            if (currentTab === 'play' && gameInProgress) {
+                const modal = document.getElementById('navConfirmModal');
+                document.getElementById('confirmExitBtn').onclick = () => {
+                    gameInProgress = false;
+                    modal.classList.add('hidden');
+                    switchTab(targetTab);
+                };
+                modal.classList.remove('hidden');
+            } else {
+                switchTab(targetTab);
+            }
+        }
+
+        function cancelNavigation() { document.getElementById('navConfirmModal').classList.add('hidden'); }
+
+        function switchTab(tabId, force = false) {
+            if (currentTab === tabId && !force) return;
+            currentTab = tabId;
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            const active = document.getElementById(`screen-${tabId}`);
+            active.classList.remove('hidden');
+            active.classList.add('animate-slide');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.id === `tab-${tabId}`));
+            if (tabId === 'study') populateArchives();
+        }
+
+        function initGame(mode, difficulty) {
+            currentMode = mode;
+            currentDifficulty = difficulty;
+            score = 0; lives = 3; xp = 0;
+            document.getElementById('xpBar').style.width = "0%";
+            
+            if (mode === 'chronology') {
+                sessionPool = [...database.chronology];
+            } else {
+                sessionPool = database.visual.filter(q => q.level === difficulty);
+            }
+            
+            gameInProgress = true;
+            document.getElementById('difficultyLabel').innerText = difficulty.toUpperCase();
+            switchTab('play', true);
+            document.getElementById('gameOver').classList.add('hidden');
+            document.getElementById('gameVictory').classList.add('hidden');
+            document.getElementById('gameplay-area').classList.remove('hidden');
+            document.getElementById('gameModeTitle').innerText = `${mode.toUpperCase()} - ${difficulty.toUpperCase()}`;
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            isProcessing = false;
+            if (sessionPool.length === 0) { showVictory(); return; }
+            const randomIndex = Math.floor(Math.random() * sessionPool.length);
+            currentQuestion = sessionPool[randomIndex];
+            currentInput = "";
+            
+            document.getElementById('score').innerText = score;
+            document.getElementById('lives').innerText = lives;
+            document.getElementById('feedbackMain').innerText = "";
+            document.getElementById('feedbackCorrect').innerText = "";
+            document.getElementById('feedbackCorrect').classList.add('opacity-0');
+
+            const isEasy = currentDifficulty === 'Easy';
+            const isAdvanced = currentDifficulty === 'Advanced';
+            const isChronology = currentMode === 'chronology';
+            
+            document.getElementById('imageContainer').classList.toggle('hidden', !isEasy && !isChronology);
+            document.getElementById('textQuestionDisplay').classList.toggle('hidden', isEasy || isChronology);
+            document.getElementById('multipleUI').classList.toggle('hidden', isAdvanced || isChronology);
+            document.getElementById('enumerationUI').classList.toggle('hidden', !isAdvanced);
+            document.getElementById('chronologyUI').classList.toggle('hidden', !isChronology);
+
+            if (isEasy || isChronology) {
+                document.getElementById('qImage').src = currentQuestion.img;
+                document.getElementById('questionDisplay').innerText = currentQuestion.q;
+            } else {
+                document.getElementById('qTextOnly').innerText = currentQuestion.q;
+            }
+
+            if (!isAdvanced && !isChronology) {
+                currentQuestion.options.forEach((opt, i) => {
+                    const b = document.getElementById(`choice${i}`);
+                    if (b) b.innerText = opt;
+                });
+            }
+            
+            if (isAdvanced) document.getElementById('enumInput').innerText = "_";
+            if (isChronology) updateChronologyDisplay();
+        }
+
+        function renderKeyboard() {
+            const keys = "QWERTYUIOPASDFGHJKLZXCVBNM ".split("");
+            const kb = document.getElementById('keyboard');
+            kb.innerHTML = "";
+            keys.forEach(k => {
+                const b = document.createElement('button');
+                b.className = "k-btn";
+                b.innerText = k === " " ? "SPACE" : k;
+                b.onclick = () => pressKey(k);
+                kb.appendChild(b);
+            });
+        }
+
+        function pressKey(k) {
+            if (isProcessing) return;
+            if (k === 'DELETE') currentInput = currentInput.slice(0, -1);
+            else if (currentInput.length < 25) currentInput += k;
+            document.getElementById('enumInput').innerText = (currentInput || "") + "_";
+        }
+
+        function submitEnum() { if (!isProcessing && currentInput.length > 0) checkAnswer(currentInput.trim().toUpperCase() === currentQuestion.ans.toUpperCase()); }
+        function pressNum(n) { if (!isProcessing && currentInput.length < 4) { currentInput += n; updateChronologyDisplay(); } }
+        function pressClear() { if (!isProcessing) { currentInput = currentInput.slice(0, -1); updateChronologyDisplay(); } }
+        function updateChronologyDisplay() { document.getElementById('guessInputDisplay').innerText = currentInput || "----"; }
+        function submitAnswer() { if (!isProcessing && currentInput.length === 4) checkAnswer(parseInt(currentInput) === currentQuestion.a); }
+        function submitChoice(i) { if (!isProcessing) checkAnswer(i === currentQuestion.a); }
+
+        function checkAnswer(isCorrect) {
+            isProcessing = true;
+            const fbMain = document.getElementById('feedbackMain');
+            const fbCorrect = document.getElementById('feedbackCorrect');
+            const t = i18n[currentLang];
+            
+            if (isCorrect) {
+                sessionPool = sessionPool.filter(q => q.id !== currentQuestion.id);
+                score++; xp = Math.min(100, xp + 10);
+                document.getElementById('xpBar').style.width = xp + "%";
+                fbMain.innerText = t.feedbackCorrect; 
+                fbMain.className = "text-[10px] font-black tracking-widest uppercase text-emerald-400";
+                setTimeout(nextQuestion, 1200);
+            } else {
+                lives--;
+                fbMain.innerText = t.feedbackWrong; 
+                fbMain.className = "text-[10px] font-black tracking-widest uppercase text-ph-red animate-pulse";
+                fbCorrect.innerText = `${t.answer}: ${currentMode === 'chronology' ? currentQuestion.a : currentQuestion.ans}`;
+                fbCorrect.classList.remove('opacity-0');
+                if (lives <= 0) setTimeout(endGame, 2000); 
+                else setTimeout(nextQuestion, 2000);
+            }
+        }
+
+        function endGame() {
+            gameInProgress = false;
+            document.getElementById('gameplay-area').classList.add('hidden');
+            document.getElementById('gameOver').classList.remove('hidden');
+            document.getElementById('finalScore').innerText = score;
+        }
+
+        function showVictory() {
+            gameInProgress = false;
+            document.getElementById('gameplay-area').classList.add('hidden');
+            document.getElementById('gameVictory').classList.remove('hidden');
+        }
+
+        function populateArchives() {
+            const list = document.getElementById('archiveList'); list.innerHTML = "";
+            allArchiveData.forEach((item, i) => {
+                const card = document.createElement('div');
+                card.className = "glass overflow-hidden rounded-[2rem] border border-white/5 flex flex-col cursor-pointer";
+                card.onclick = () => {
+                    const modal = document.getElementById('archiveModal');
+                    document.getElementById('modalImg').src = item.img;
+                    document.getElementById('modalTitle').innerText = item.q;
+                    document.getElementById('modalDesc').innerText = item.desc;
+                    modal.classList.remove('hidden'); modal.style.display = 'flex';
+                };
+                card.innerHTML = `<img src="${item.img}" class="w-full h-24 object-cover border-b border-white/10"><div class="p-3 text-[9px] font-bold text-stone-300 truncate">${item.q}</div>`;
+                list.appendChild(card);
+            });
+        }
+
+        function closeModal() { document.getElementById('archiveModal').classList.add('hidden'); document.getElementById('archiveModal').style.display = 'none'; }
+    </script>
+</body>
+</html>
